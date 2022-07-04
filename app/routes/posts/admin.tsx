@@ -1,8 +1,7 @@
-import { useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { Link, Outlet } from "react-router-dom";
-import LoadedComponent from "~/components/loaded";
+import { Link } from "react-router-dom";
 import { getPosts } from "~/models/post.server";
 
 type LoaderData = {
@@ -10,7 +9,6 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async () => {
-  console.log("Loader is called");
   return json<LoaderData>({ posts: await getPosts() });
 };
 
@@ -34,10 +32,6 @@ export default function PostAdmin() {
           </ul>
         </nav>
         <main className="col-span-4 md:col-span-3">
-          <LoadedComponent />
-          <LoadedComponent />
-          <LoadedComponent />
-          <LoadedComponent />
           <Outlet />
         </main>
       </div>
