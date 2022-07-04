@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData, useTransition } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { Link } from "react-router-dom";
@@ -14,6 +14,7 @@ export const loader: LoaderFunction = async () => {
 
 export default function PostAdmin() {
   const { posts } = useLoaderData<LoaderData>();
+  const optimisticNewPost = useOptimisticNewPost();
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="my-6 mb-2 border-b-2 text-center text-3xl">Blog Admin</h1>
@@ -29,6 +30,7 @@ export default function PostAdmin() {
                 </li>
               );
             })}
+            {optimisticNewPost}
           </ul>
         </nav>
         <main className="col-span-4 md:col-span-3">
@@ -36,5 +38,25 @@ export default function PostAdmin() {
         </main>
       </div>
     </div>
+  );
+}
+
+function useOptimisticNewPost() {
+  const transition = useTransition();
+  const isSubmitting = transition.state === "submitting";
+  const formData = transition.submission?.formData;
+  const isCreating = isSubmitting && formData?.get("_action") === "create";
+  const newTitle = formData?.get("title");
+  const newSlug = formData?.get("slug");
+  return (
+    isCreating &&
+    typeof newTitle === "string" &&
+    typeof newSlug === "string" && (
+      <li>
+        <Link to={newSlug} className="text-blue-600 underline">
+          {newTitle}
+        </Link>
+      </li>
+    )
   );
 }
